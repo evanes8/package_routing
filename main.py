@@ -36,10 +36,6 @@ class HashTable:
 
 
 
-
-
-
-
 #create a dictionary that will be used to store values from matrix
 class AdjacencyList:
     def __init__(self, initial_cap=20):
@@ -106,14 +102,18 @@ for package in packages:
     my_hash.insert(int(package[0]), package[1], package[5], package[2], package[4], package[6],'hub')
 
 #load trucks with ids of packages
-'''
-truck1=[1, 13, 14, 15, 16, 19, 20, 29, 30, 31, 34, 37]
-'''
 load1_packages=[1, 13, 14, 15, 16, 19, 20, 29, 30, 31, 34, 37]
 load1_departure_time=datetime.datetime(2020, 5, 17, 8) 
 load1=Load(1, load1_packages, load1_departure_time)
 truck1=Truck(1)
 truck1.add_load(load1)
+
+load2_packages=[3, 18, 36, 38, 6, 25, 28, 32]
+load2_departure_time=datetime.datetime(2020, 5, 17, 9, 5)
+load2=Load(2, load2_packages, load2_departure_time)
+truck2=Truck(2)
+truck2.add_load(load2)
+
 
 ###################
 def generate_route(package_list):
@@ -135,7 +135,7 @@ def generate_route(package_list):
     truck_mst=AdjacencyList()
     for i in range(1, len(parents)):
         truck_mst.add_vertex(parents[i], tree[i])
-    truck_mst.print_items()
+   # truck_mst.print_items()
 
     root=tree[0]
     visited =[] # Set to keep track of visited nodes.
@@ -146,52 +146,9 @@ def generate_route(package_list):
 load1.set_route(generate_route(load1.packages))
 print(load1.route)
 
-'''
-#need to create an ajdecy list from this 
-truck1_adjlist=AdjacencyList()
+load2.set_route(generate_route(load2.packages))
+print(load2.route)
 
-for id1 in truck1:
-    id1_val=[]
-    for id2 in truck1:
-        if id2!=id1:
-            distance=matrix[(address_lookup(my_hash.search(id1).address))][(address_lookup(my_hash.search(id2).address))]
-            id1_val.append([id2, distance])
-    truck1_adjlist.insert(id1, id1_val)
-
-#every adjency list should start and end at the hub so hub will be included regardless
-#of the the packages loaded
-#create hubs adjency list and update the lists for all to include hub
-for id2 in truck1:
-    distance=matrix[0][(address_lookup(my_hash.search(id2).address))]
-    truck1_adjlist.add_vertex(0, [id2, distance])
-    truck1_adjlist.add_vertex(id2, [0, distance])
-
-#truck1_adjlist.print_items()
-
-#choose a vertex from keys
-#tree.append(vertex)
-#for each vertex in tree return the min if that min- if the min is in tree find a new one and return that
-#once u have the mins of all the vertexs in tree pick the smallest one and append it to tree
-#if a vertex has no valid min to return just return none
-#when ur overall min is none your done
-
-
-tree, parents=prims(truck1_adjlist, 0)
-truck1_mst=AdjacencyList()
-for i in range(1, len(parents)):
-    truck1_mst.add_vertex(parents[i], tree[i])
-
-truck1_mst.print_items()
-
-
-
-#truck1_mst is an adj list of the mst graph
-#now do simple dfs discovery
-root=tree[0]
-visited =[] # Set to keep track of visited nodes.
-dfs(visited, truck1_mst, root)#shortest roundtrip tour is equal to the order nodes are visited in a dfs of the mst
-print(visited)
-'''
 #deliver the packages along the route in visited
 #keep track of distance travled starting from the hub
 #trucks move at 18 mph
@@ -224,7 +181,7 @@ def deliver_packages(route, start_time):
         j_address=j_package.address
         distance=matrix[address_lookup(i_address)][address_lookup(j_address)]
         seconds=distance/speed
-        print(distance, seconds)
+       # print(distance, seconds)
         time_change=datetime.timedelta(seconds=seconds)
         total_dist+=distance
         time+=time_change
@@ -234,47 +191,13 @@ def deliver_packages(route, start_time):
     j_address='HUB'
     distance=matrix[address_lookup(i_address)][address_lookup(j_address)]
     seconds=distance/speed
-    print(distance, seconds)
+   # print(distance, seconds)
     time_change=datetime.timedelta(seconds=seconds)
     total_dist+=distance
     time+=time_change#dont need to update status for this last one cause its not a package
     return total_dist, time.strftime("%X")
 
 print(deliver_packages(load1.route, load1.departure_time))
-print(my_hash.search(14).status, my_hash.search(14).enroute_time)
+print(deliver_packages(load2.route, load2.departure_time))
+#print(my_hash.search(14).status, my_hash.search(14).enroute_time)
 
-'''
-total_dist=0
-time=datetime.datetime(2020, 5, 17, 8)
-speed=.005 #miles per second
-for i in range(len(visited)-2):#iterate to second to last package
-    j=i+1
-    if visited[i]==0:
-        i_address='HUB'#hub isnt a package so its not in the hashtable
-    else:
-        i_address=my_hash.search(visited[i]).address
-    
-    j_package=my_hash.search(visited[j]) 
-    j_address=j_package.address
-    distance=matrix[address_lookup(i_address)][address_lookup(j_address)]
-    seconds=distance/speed
-    print(distance, seconds)
-    time_change=datetime.timedelta(seconds=seconds)
-    total_dist+=distance
-    time+=time_change
-    my_hash.update_status(j_package.id, time)
-#this for loop dosnt include time from last package back to hub need to add that
-i_address=my_hash.search(visited[-1]).address
-j_address='HUB'
-distance=matrix[address_lookup(i_address)][address_lookup(j_address)]
-seconds=distance/speed
-print(distance, seconds)
-time_change=datetime.timedelta(seconds=seconds)
-total_dist+=distance
-time+=time_change
-
-
-
-print(total_dist)
-print(time.strftime("%X"))
-'''
