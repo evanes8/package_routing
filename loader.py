@@ -1,7 +1,7 @@
 import csv
 
 
-def dist_loader():
+def dist_importer():
     with open('distance_table_csv.csv', newline='') as csv_file:
         csv_reader=csv.reader(csv_file)
         linecount=0
@@ -48,7 +48,7 @@ def dist_loader():
 #name lsit is loaded by this point
 
 
-def package_loader():
+def package_importer():
     with open('packages.csv', newline='') as csv_file:
         csv_reader=csv.reader(csv_file)
         linecount=0
