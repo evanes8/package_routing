@@ -102,19 +102,24 @@ for package in packages:
     my_hash.insert(int(package[0]), package[1], package[5], package[2], package[4], package[6],'hub')
 
 #load trucks with ids of packages
-load1_packages=[1, 13, 14, 15, 16, 19, 20, 29, 30, 31, 34, 37]
+load1_packages=[1,5, 7, 13, 14, 15, 16, 19, 20,21, 29, 30, 34, 37, 39]#15
 load1_departure_time=datetime.datetime(2020, 5, 17, 8) 
 load1=Load(1, load1_packages, load1_departure_time)
 truck1=Truck(1)
 truck1.add_load(load1)
 
-load2_packages=[3, 18, 36, 38, 6, 25, 28, 32]
+load2_packages=[3,4, 6,18, 25, 28,31, 32,  36, 38,40]#11
 load2_departure_time=datetime.datetime(2020, 5, 17, 9, 5)
 load2=Load(2, load2_packages, load2_departure_time)
 truck2=Truck(2)
 truck2.add_load(load2)
 
-
+my_hash.insert(9, '410 S State St', 'EOD', 'Salt Lake City', '84111', '2.0', 'hub')
+load3_packages=[2, 8, 9, 10, 11, 12, 17,22, 23, 24, 26, 27, 33, 35 ]#14
+load3_departure_time=datetime.datetime(2020, 5, 17, 10, 30)
+load3=Load(3, load3_packages, load3_departure_time)
+truck1.add_load(load3)
+#finish the rest of loading and testing
 ###################
 def generate_route(package_list):
     truck_adjlist=AdjacencyList()
@@ -149,6 +154,8 @@ print(load1.route)
 load2.set_route(generate_route(load2.packages))
 print(load2.route)
 
+load3.set_route(generate_route(load3.packages))
+print(load3.route)
 #deliver the packages along the route in visited
 #keep track of distance travled starting from the hub
 #trucks move at 18 mph
@@ -169,7 +176,7 @@ def deliver_packages(route, start_time):
             package=my_hash.search(packageid)
             package.update_status('enroute', start_time)
 
-    for i in range(len(route)-2):#iterate to second to last package
+    for i in range(len(route)-1):#iterate to second to last package
         j=i+1
         if route[i]==0:
             i_address='HUB'#hub isnt a package so its not in the hashtable
@@ -181,7 +188,7 @@ def deliver_packages(route, start_time):
         j_address=j_package.address
         distance=matrix[address_lookup(i_address)][address_lookup(j_address)]
         seconds=distance/speed
-       # print(distance, seconds)
+        print(i_address,'|',  j_address,'|',  distance,'|',  seconds)
         time_change=datetime.timedelta(seconds=seconds)
         total_dist+=distance
         time+=time_change
@@ -191,7 +198,7 @@ def deliver_packages(route, start_time):
     j_address='HUB'
     distance=matrix[address_lookup(i_address)][address_lookup(j_address)]
     seconds=distance/speed
-   # print(distance, seconds)
+    print(i_address,'|',  j_address,'|',  distance,'|',  seconds)
     time_change=datetime.timedelta(seconds=seconds)
     total_dist+=distance
     time+=time_change#dont need to update status for this last one cause its not a package
@@ -199,5 +206,24 @@ def deliver_packages(route, start_time):
 
 print(deliver_packages(load1.route, load1.departure_time))
 print(deliver_packages(load2.route, load2.departure_time))
-#print(my_hash.search(14).status, my_hash.search(14).enroute_time)
+print(deliver_packages(load3.route, load3.departure_time))
+
+#make sure each package is delivered in time test
+
+for id in range(1, 41):
+    package=my_hash.search(id)
+    print('package ID: ', package.id,  'package deadline :',
+            package.deadline, 'package enroute :', package.enroute_time, 'package delivered :', package.delivered_time)
+
+
+
+
+
+
+
+
+
+
+
+
 
