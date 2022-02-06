@@ -166,7 +166,9 @@ print(load3.route)
 #takes in start time and the trucks visited array
 #set that status as enroute and include a timestamp
 #then deliver and mark time as u deliver
-def deliver_packages(route, start_time):
+def deliver_packages(load):
+    route=load.route
+    start_time=load.departure_time
     total_dist=0
     time=start_time
     speed=.005 #miles per second
@@ -202,12 +204,14 @@ def deliver_packages(route, start_time):
     time_change=datetime.timedelta(seconds=seconds)
     total_dist+=distance
     time+=time_change#dont need to update status for this last one cause its not a package
+    load.set_arrival_time(time)
     return total_dist, time.strftime("%X")
 
-print(deliver_packages(load1.route, load1.departure_time))
-print(deliver_packages(load2.route, load2.departure_time))
-print(deliver_packages(load3.route, load3.departure_time))
+print(deliver_packages(load1))
+print(deliver_packages(load2))
+print(deliver_packages(load3))
 
+'''
 #make sure each package is delivered in time test
 
 for id in range(1, 41):
@@ -215,15 +219,40 @@ for id in range(1, 41):
     print('package ID: ', package.id,  'package deadline :',
             package.deadline, 'package enroute :', package.enroute_time, 'package delivered :', package.delivered_time)
 
+'''
+
+def package_info(package_id, timestamp):
+    #given a proper datetime and package id, print nicley on screen all package data
+    package=my_hash.search(package_id)
+    status_message=package.check_status(timestamp)
+    return f'|Package ID: {package.id:2}| Address: {package.address:40}| City: {package.city:17}| Zip: {package.zip:6}| Deadline: {package.deadline:10}| Weight: {package.mass:3}| Delivery Status: {status_message:21}|'
+
+
+#also need a function to display total distance of all the trucks at a specific time
+
+def total_truck_distance(time):
+    total_distance=0
+    loads=truck1.loads+truck2.loads
+    for load in loads:
+        if load.arrival_time<=time:
+            time_diff=load.arrival_time-load.departure_time
+        elif load.departure_time<=time:
+            time_diff=time-load.departure_time
+        else:
+            time_diff=datetime.timedelta(seconds=0)
+        distance=time_diff.total_seconds()*.005 #miles per second
+        total_distance+=distance
+    return total_distance
 
 
 
 
+for i in range(1, 41):
+    print(package_info(i, datetime.datetime(2020, 5, 17, 9, 35)))
 
+print(total_truck_distance(datetime.datetime(2020, 5, 17, 9, 35)))
 
-
-
-
-
+#now that these functions work need to create a while loop prompt
+#also need to parse time input and convert to proper datetime
 
 

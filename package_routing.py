@@ -24,6 +24,14 @@ class Package:
                     self.enroute_time=arg
                 else:
                     self.delivered_time=arg
+    
+    def check_status(self, time):
+        if time>=self.delivered_time:
+            return "Delivered at "+ self.delivered_time.strftime("%X")
+        elif time >= self.enroute_time:
+            return "Enroute"
+        else:
+            return "At Hub"
 
 class Load():
     def __init__(self, id, packages, departure_time):
