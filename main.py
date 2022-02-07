@@ -149,13 +149,13 @@ def generate_route(package_list):
 
 #################
 load1.set_route(generate_route(load1.packages))
-print(load1.route)
+#print(load1.route)
 
 load2.set_route(generate_route(load2.packages))
-print(load2.route)
+#print(load2.route)
 
 load3.set_route(generate_route(load3.packages))
-print(load3.route)
+#print(load3.route)
 #deliver the packages along the route in visited
 #keep track of distance travled starting from the hub
 #trucks move at 18 mph
@@ -190,7 +190,7 @@ def deliver_packages(load):
         j_address=j_package.address
         distance=matrix[address_lookup(i_address)][address_lookup(j_address)]
         seconds=distance/speed
-        print(i_address,'|',  j_address,'|',  distance,'|',  seconds)
+       # print(i_address,'|',  j_address,'|',  distance,'|',  seconds)
         time_change=datetime.timedelta(seconds=seconds)
         total_dist+=distance
         time+=time_change
@@ -200,26 +200,17 @@ def deliver_packages(load):
     j_address='HUB'
     distance=matrix[address_lookup(i_address)][address_lookup(j_address)]
     seconds=distance/speed
-    print(i_address,'|',  j_address,'|',  distance,'|',  seconds)
+   # print(i_address,'|',  j_address,'|',  distance,'|',  seconds)
     time_change=datetime.timedelta(seconds=seconds)
     total_dist+=distance
     time+=time_change#dont need to update status for this last one cause its not a package
     load.set_arrival_time(time)
     return total_dist, time.strftime("%X")
 
-print(deliver_packages(load1))
-print(deliver_packages(load2))
-print(deliver_packages(load3))
+deliver_packages(load1)
+deliver_packages(load2)
+deliver_packages(load3)
 
-'''
-#make sure each package is delivered in time test
-
-for id in range(1, 41):
-    package=my_hash.search(id)
-    print('package ID: ', package.id,  'package deadline :',
-            package.deadline, 'package enroute :', package.enroute_time, 'package delivered :', package.delivered_time)
-
-'''
 
 def package_info(package_id, timestamp):
     #given a proper datetime and package id, print nicley on screen all package data
@@ -247,12 +238,73 @@ def total_truck_distance(time):
 
 
 
-for i in range(1, 41):
-    print(package_info(i, datetime.datetime(2020, 5, 17, 9, 35)))
-
-print(total_truck_distance(datetime.datetime(2020, 5, 17, 9, 35)))
-
 #now that these functions work need to create a while loop prompt
 #also need to parse time input and convert to proper datetime
+
+
+choice= input("Type 1 and press enter to see the data for a "+
+        "specific package, type 2 and press enter to see the data for all the packages, "
+        "or type q and press enter to exit.")
+
+if choice!='q':
+    if choice=='1':
+        packageid=int(input('Please enter the Id of the package you would like to see the data for. '))
+        while packageid<1 or packageid>40:
+            print('Package does not exist!')
+            packageid=int(input('Please enter the Id of the package you would like to see the data for. '))
+
+        time_string=input('Enter a time after 08:00:00 (in millitary time i.e., 0900) to check package status. '+
+           'The entered time must have exactly 4 digits. ' )
+        hour=int(time_string[:2])
+        minute=int(time_string[2:])
+
+        while len(time_string)!=4 or hour<8 or minute>59:
+            print('Time entered incorrectly. ')
+            time_string=input('Enter a time after 08:00:00 (in millitary time i.e., 0900) to check package status. '+
+           'The entered time must have exactly 4 digits. ' )
+            hour=int(time_string[:2])
+            minute=int(time_string[2:])
+        time=datetime.datetime(2020, 5, 17, hour, minute)
+        print()
+        print(f'Packge data for package number {packageid}, at time '+ time.strftime("%X"))
+        print(package_info(packageid, time))
+        print(f'Total mileage traveled by all trucks: {total_truck_distance(time)} miles' )
+
+    if choice=='2':
+        time_string=input('Enter a time after 08:00:00 (in millitary time i.e., 0900) to check package status. '+
+           'The entered time must have exactly 4 digits. ' )
+        hour=int(time_string[:2])
+        minute=int(time_string[2:])
+
+        while len(time_string)!=4 or hour<8 or hour>23 or minute>59:
+            print('Time entered incorrectly. ')
+            time_string=input('Enter a time after 08:00:00 (in millitary time i.e., 0900) to check package status. '+
+           'The entered time must have exactly 4 digits. ' )
+            hour=int(time_string[:2])
+            minute=int(time_string[2:])
+        time=datetime.datetime(2020, 5, 17, hour, minute)
+        print()
+        print(f'Packge data for all packages, at time '+ time.strftime("%X")+ ' : ')
+
+        for i in range(1, 41):
+            print(package_info(i, time))
+        
+        print(f'Total mileage traveled by all trucks: {total_truck_distance(time)} miles' )
+
+
+            
+
+
+
+
+
+
+
+
+
+        
+
+
+
 
 
