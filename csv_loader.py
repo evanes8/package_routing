@@ -2,7 +2,7 @@ import csv
 
 
 def dist_importer():
-    with open('distance_table_csv.csv', newline='') as csv_file:
+    with open('distance_table.csv', newline='') as csv_file:
         csv_reader=csv.reader(csv_file)
         linecount=0
         rows=[]

@@ -1,4 +1,4 @@
-from loader import package_importer, dist_importer
+from csv_loader import package_importer, dist_importer
 from tsp import prims, dfs
 from package_routing import Package, Load, Truck
 
