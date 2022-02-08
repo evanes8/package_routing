@@ -1,14 +1,10 @@
+#Evan Supple 001513809
 from csv_loader import package_importer, dist_importer
 from tsp import prims, dfs
 from package_routing import Package, Load, Truck
 
 import datetime
 
-#for rn i dont see why this is useful ill just read directly into the hash table
-
-
-#the hashtable insert should be able to work on its own and create brand new packages to
-#be added. we just happen to be reading our objects into this hash table
 class HashTable:
     def __init__(self, initial_cap=40):
         self.table =[]
@@ -35,8 +31,7 @@ class HashTable:
         return None
 
 
-
-#create a dictionary that will be used to store values from matrix
+#Create a dictionary to store points and vertexs
 class AdjacencyList:
     def __init__(self, initial_cap=20):
         self.table =[]
@@ -95,6 +90,7 @@ my_hash=HashTable()
 packages=package_importer()
 matrix, names=dist_importer()
 
+#Lookup function to convert address to indexs for the distance matrix
 def address_lookup(address):
     return names.index(address)
 
@@ -102,7 +98,8 @@ for package in packages:
     my_hash.insert(int(package[0]), package[1], package[5], package[2], package[4], package[6],'hub')
 
 print("Package data imported.")
-#load trucks with ids of packages
+
+#Packages are assigned to specific loads and loads are assigned to specific trucks
 load1_packages=[1,5, 7, 13, 14, 15, 16, 19, 20,21, 29, 30, 34, 37, 39]#15
 load1_departure_time=datetime.datetime(2020, 5, 17, 8) 
 load1=Load(1, load1_packages, load1_departure_time)
@@ -115,6 +112,8 @@ load2=Load(2, load2_packages, load2_departure_time)
 truck2=Truck(2)
 truck2.add_load(load2)
 
+#The error in package 9's address is corrected here because the load containing
+#this package isnt leaving until 10:30.
 my_hash.insert(9, '410 S State St', 'EOD', 'Salt Lake City', '84111', '2.0', 'hub')
 load3_packages=[2, 8, 9, 10, 11, 12, 17,22, 23, 24, 26, 27, 33, 35 ]#14
 load3_departure_time=datetime.datetime(2020, 5, 17, 10, 30)
@@ -122,7 +121,11 @@ load3=Load(3, load3_packages, load3_departure_time)
 truck1.add_load(load3)
 print("Trucks Loaded.")
 
-###################
+#This function creates an adjacency list from the packages assigned to each load
+#and passes it to function prims(defined in tsp.py) which creates a 
+#minimum spanning tree from the package distances. The MST is passed to function dfs
+# also defined in tsp.py). The output of dfs is a preorder traversal of the MST
+#which is used as the tour of packages for the load.
 def generate_route(package_list):
     truck_adjlist=AdjacencyList()
     for id1 in package_list:
@@ -142,33 +145,20 @@ def generate_route(package_list):
     truck_mst=AdjacencyList()
     for i in range(1, len(parents)):
         truck_mst.add_vertex(parents[i], tree[i])
-   # truck_mst.print_items()
 
     root=tree[0]
     visited =[] # Set to keep track of visited nodes.
     dfs(visited, truck_mst, root)#shortest roundtrip tour is equal to the order nodes are visited in a dfs of the mst
     return visited
 
-#################
 load1.set_route(generate_route(load1.packages))
-#print(load1.route)
-
 load2.set_route(generate_route(load2.packages))
-#print(load2.route)
-
 load3.set_route(generate_route(load3.packages))
 print("Load routes generated.")
-#print(load3.route)
-#deliver the packages along the route in visited
-#keep track of distance travled starting from the hub
-#trucks move at 18 mph
-#time starts at 8am
-#timesstamp when they are on enroute and delivered as [0, 0] or time
 
-#this has to be made into a funtion
-#takes in start time and the trucks visited array
-#set that status as enroute and include a timestamp
-#then deliver and mark time as u deliver
+#Given a specific load, this function delivers the packages in the order
+#determined by the load's route. Times are calculated based on the assumed speed
+#of the trucks and the distance between each pair of addresses.
 def deliver_packages(load):
     route=load.route
     start_time=load.departure_time
@@ -192,18 +182,17 @@ def deliver_packages(load):
         j_package=my_hash.search(route[j])
         j_address=j_package.address
         distance=matrix[address_lookup(i_address)][address_lookup(j_address)]
-        seconds=distance/speed
-       # print(i_address,'|',  j_address,'|',  distance,'|',  seconds)
+        seconds=distance/speed 
         time_change=datetime.timedelta(seconds=seconds)
         total_dist+=distance
         time+=time_change
         j_package.update_status('delivered', time)
-    #this for loop dosnt include time from last package back to hub need to add that
+    
+    #this block finds the distance and time from the last package delivery back to the hub
     i_address=my_hash.search(route[-1]).address
     j_address='HUB'
     distance=matrix[address_lookup(i_address)][address_lookup(j_address)]
     seconds=distance/speed
-   # print(i_address,'|',  j_address,'|',  distance,'|',  seconds)
     time_change=datetime.timedelta(seconds=seconds)
     total_dist+=distance
     time+=time_change#dont need to update status for this last one cause its not a package
@@ -216,16 +205,16 @@ dist3, time3=deliver_packages(load3)
 print(f'All packages delivered. Combined distance travelled by all trucks is {dist1+dist2+dist3} miles.' )
 print()
 
-
+#Given id and a time, print nicely on screen all package data from the hash table
 def package_info(package_id, timestamp):
-    #given a proper datetime and package id, print nicley on screen all package data
     package=my_hash.search(package_id)
     status_message=package.check_status(timestamp)
     return f'|Package ID: {package.id:2}| Address: {package.address:40}| City: {package.city:17}| Zip: {package.zip:6}| Deadline: {package.deadline:10}| Weight: {package.mass:3}| Delivery Status: {status_message:21}|'
 
 
-#also need a function to display total distance of all the trucks at a specific time
-
+#Backcalculate the distance each truck covered at a specific time
+#by finding the time each load was driving for and multiplying by 
+#constant speed.
 def total_truck_distance(time):
     total_distance=0
     loads=truck1.loads+truck2.loads
@@ -243,9 +232,7 @@ def total_truck_distance(time):
 
 
 
-#now that these functions work need to create a while loop prompt
-#also need to parse time input and convert to proper datetime
-
+#This interface for package and truck data is run after the packages are delivered and timestamped.
 
 choice= input("Type 1 and press enter to see the data for a "+
         "specific package, type 2 and press enter to see the data for all the packages, "
@@ -271,7 +258,7 @@ if choice!='q':
             minute=int(time_string[2:])
         time=datetime.datetime(2020, 5, 17, hour, minute)
         print()
-        print(f'Packge data for package number {packageid}, at time '+ time.strftime("%X"))
+        print(f'Packge data for package number {packageid} at time '+ time.strftime("%X"))
         print()
         print(package_info(packageid, time))
         print(f'Total mileage traveled by all trucks as of ' + time.strftime("%X") + f': {total_truck_distance(time)} miles' )
@@ -290,7 +277,7 @@ if choice!='q':
             minute=int(time_string[2:])
         time=datetime.datetime(2020, 5, 17, hour, minute)
         print()
-        print(f'Packge data for all packages, at time '+ time.strftime("%X")+ ' : ')
+        print(f'Packge data for all packages at time '+ time.strftime("%X")+ ' : ')
         print()
 
         for i in range(1, 41):
@@ -300,16 +287,6 @@ if choice!='q':
 
 
             
-
-
-
-
-
-
-
-
-
-        
 
 
 

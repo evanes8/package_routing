@@ -1,11 +1,12 @@
 
 
 
-
-def prims(graph, root):#returns a min spanning tree as a adjency list graph
+#creates the minimum spanning tree of a specific graph
+#graph must be input as an adjancecy list
+def prims(graph, root):
     cur_vertex=root
     tree=[]
-    parents=[]
+    parents=[]#parent list which corresponds to tree list defining the parent of each node
     parents.append(-1000)#parent of root does not exist
 
     while cur_vertex is not None:
@@ -30,7 +31,8 @@ def prims(graph, root):#returns a min spanning tree as a adjency list graph
 
     
 
-
+#simple depth first search keeping track of 
+#nodes as they are visited for the first time
 def dfs(visited, graph, node):
     if node not in visited:
         visited.append(node)

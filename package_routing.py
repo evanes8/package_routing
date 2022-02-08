@@ -10,7 +10,7 @@ class Package:
         self.zip=zip
         self.mass=mass
         self.status=status
-        self.enroute_time=0
+        self.enroute_time=0#enroute and delivered timestamps determine package status at a certain time
         self.delivered_time=0
     
     def __hash__(self):
@@ -33,6 +33,7 @@ class Package:
         else:
             return "At Hub"
 
+#each load is composed of packages that will be delivered sequentially in a tour
 class Load():
     def __init__(self, id, packages, departure_time):
         self.id=id
@@ -46,6 +47,7 @@ class Load():
     def set_route(self, route):
         self.route=route
 
+#Trucks are assigned specific loads
 class Truck():
     def __init__(self, id):
         self.id=id
