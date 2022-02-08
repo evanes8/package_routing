@@ -101,6 +101,7 @@ def address_lookup(address):
 for package in packages:
     my_hash.insert(int(package[0]), package[1], package[5], package[2], package[4], package[6],'hub')
 
+print("Package data imported.")
 #load trucks with ids of packages
 load1_packages=[1,5, 7, 13, 14, 15, 16, 19, 20,21, 29, 30, 34, 37, 39]#15
 load1_departure_time=datetime.datetime(2020, 5, 17, 8) 
@@ -119,7 +120,8 @@ load3_packages=[2, 8, 9, 10, 11, 12, 17,22, 23, 24, 26, 27, 33, 35 ]#14
 load3_departure_time=datetime.datetime(2020, 5, 17, 10, 30)
 load3=Load(3, load3_packages, load3_departure_time)
 truck1.add_load(load3)
-#finish the rest of loading and testing
+print("Trucks Loaded.")
+
 ###################
 def generate_route(package_list):
     truck_adjlist=AdjacencyList()
@@ -155,6 +157,7 @@ load2.set_route(generate_route(load2.packages))
 #print(load2.route)
 
 load3.set_route(generate_route(load3.packages))
+print("Load routes generated.")
 #print(load3.route)
 #deliver the packages along the route in visited
 #keep track of distance travled starting from the hub
@@ -207,9 +210,11 @@ def deliver_packages(load):
     load.set_arrival_time(time)
     return total_dist, time.strftime("%X")
 
-deliver_packages(load1)
-deliver_packages(load2)
-deliver_packages(load3)
+dist1, time1=deliver_packages(load1)
+dist2, time2=deliver_packages(load2)
+dist3, time3=deliver_packages(load3)
+print(f'All packages delivered. Combined distance travelled by all trucks is {dist1+dist2+dist3} miles.' )
+print()
 
 
 def package_info(package_id, timestamp):
@@ -267,8 +272,9 @@ if choice!='q':
         time=datetime.datetime(2020, 5, 17, hour, minute)
         print()
         print(f'Packge data for package number {packageid}, at time '+ time.strftime("%X"))
+        print()
         print(package_info(packageid, time))
-        print(f'Total mileage traveled by all trucks: {total_truck_distance(time)} miles' )
+        print(f'Total mileage traveled by all trucks as of ' + time.strftime("%X") + f': {total_truck_distance(time)} miles' )
 
     if choice=='2':
         time_string=input('Enter a time after 08:00:00 (in millitary time i.e., 0900) to check package status. '+
@@ -285,11 +291,12 @@ if choice!='q':
         time=datetime.datetime(2020, 5, 17, hour, minute)
         print()
         print(f'Packge data for all packages, at time '+ time.strftime("%X")+ ' : ')
+        print()
 
         for i in range(1, 41):
             print(package_info(i, time))
         
-        print(f'Total mileage traveled by all trucks: {total_truck_distance(time)} miles' )
+        print(f'Total mileage traveled by all trucks as of ' + time.strftime("%X") + f': {total_truck_distance(time)} miles' )
 
 
             
