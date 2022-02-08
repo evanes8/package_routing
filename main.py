@@ -87,19 +87,23 @@ class AdjacencyList:
 
 my_hash=HashTable()
 
+#loading the data from csv O(n) time and space
 packages=package_importer()
 matrix, names=dist_importer()
 
 #Lookup function to convert address to indexs for the distance matrix
+#O(n) time O(1) space
 def address_lookup(address):
     return names.index(address)
 
+#inserting packages in hash table O(1) time and O(n) space
 for package in packages:
     my_hash.insert(int(package[0]), package[1], package[5], package[2], package[4], package[6],'hub')
 
 print("Package data imported.")
 
 #Packages are assigned to specific loads and loads are assigned to specific trucks
+#O(n) space
 load1_packages=[1,5, 7, 13, 14, 15, 16, 19, 20,21, 29, 30, 34, 37, 39]#15
 load1_departure_time=datetime.datetime(2020, 5, 17, 8) 
 load1=Load(1, load1_packages, load1_departure_time)
@@ -126,6 +130,9 @@ print("Trucks Loaded.")
 #minimum spanning tree from the package distances. The MST is passed to function dfs
 # also defined in tsp.py). The output of dfs is a preorder traversal of the MST
 #which is used as the tour of packages for the load.
+#Function runs in total O(n^2) time b/c adjaceny list generation takes O(n^2)
+#and prims also takes O(n^2) where n is the number of packages. Space is also
+#O(n^2) where n is the number of packages b/c of the adjacnecy list generation.
 def generate_route(package_list):
     truck_adjlist=AdjacencyList()
     for id1 in package_list:
@@ -159,6 +166,9 @@ print("Load routes generated.")
 #Given a specific load, this function delivers the packages in the order
 #determined by the load's route. Times are calculated based on the assumed speed
 #of the trucks and the distance between each pair of addresses.
+#This function runs in O(n) time based on the number of packages in the load.
+#Space is O(1) b/c constant space is used no matter how many packages are
+#in the load.
 def deliver_packages(load):
     route=load.route
     start_time=load.departure_time
@@ -215,6 +225,7 @@ def package_info(package_id, timestamp):
 #Backcalculate the distance each truck covered at a specific time
 #by finding the time each load was driving for and multiplying by 
 #constant speed.
+#O(n) time , O(1) space
 def total_truck_distance(time):
     total_distance=0
     loads=truck1.loads+truck2.loads
@@ -285,7 +296,7 @@ if choice!='q':
         
         print(f'Total mileage traveled by all trucks as of ' + time.strftime("%X") + f': {total_truck_distance(time)} miles' )
 
-
+#total program runtime O(n^2), total space O(n^2)
             
 
 
